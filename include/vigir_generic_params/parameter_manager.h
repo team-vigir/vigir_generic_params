@@ -52,7 +52,7 @@ class ParameterManager
   : boost::noncopyable
 {
 public:
-  static void initTopics(ros::NodeHandle& nh);
+  static void initialize(ros::NodeHandle& nh);
 
   static void clear();
 

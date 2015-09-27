@@ -9,7 +9,7 @@ ParameterManager::ParameterManager()
 {
 }
 
-void ParameterManager::initTopics(ros::NodeHandle& nh)
+void ParameterManager::initialize(ros::NodeHandle& nh)
 {
   // subscribe topics
   Instance()->update_parameter_set_sub = nh.subscribe("params/update_parameter_set", 1, &ParameterManager::updateParameterSet, Instance().get());
@@ -256,7 +256,7 @@ bool ParameterManager::getParameterSetNamesService(GetParameterSetNamesService::
   return true;
 }
 
-//--- action server calls ---
+// --- Action Server calls ---
 
 void ParameterManager::setParameterSetAction(const SetParameterSetGoalConstPtr& goal)
 {
