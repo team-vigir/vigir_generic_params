@@ -53,7 +53,7 @@ const std::string& ParameterSet::getName() const
 }
 
 template<>
-void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue &p)
+void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue& p)
 {
   if (p.valid())
   {
@@ -62,7 +62,7 @@ void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue &p
 
     if (_key.empty())
     {
-      ROS_WARN("[setParam] Got empty key. Skipping!");
+      ROS_WARN("[ParameterSet] setParam: Got empty key. Skipping!");
       return;
     }
 
@@ -81,11 +81,11 @@ void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue &p
           return;
 
         if (!old_name.empty())
-          ROS_INFO("[ParameterSet] Renamed parameter set '%s' to '%s'.", old_name.c_str(), name.c_str());
+          ROS_INFO("[ParameterSet] setParam: Renamed parameter set '%s' to '%s'.", old_name.c_str(), name.c_str());
       }
       else
       {
-        ROS_ERROR("[setParam] Parameter 'name' must be a string!");
+        ROS_ERROR("[ParameterSet] setParam: Parameter 'name' must be a string!");
         return;
       }
     }
@@ -93,7 +93,7 @@ void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue &p
     params[_key] = p;
   }
   else
-    ROS_ERROR("[setParam] Type of parameter '%s' not supported!", key.c_str());
+    ROS_ERROR("[ParameterSet] setParam: Type of parameter '%s' not supported!", key.c_str());
 }
 
 template<>
@@ -103,7 +103,7 @@ void ParameterSet::setParam(const std::string& key, const ros::NodeHandle& nh)
   {
     if (!nh.hasParam(key))
     {
-      ROS_WARN("[setParam] Requested parameter '%s' was not found in '%s'!", key.c_str(), (nh.getNamespace() + "/" + key).c_str());
+      ROS_WARN("[ParameterSet] setParam: Requested parameter '%s' was not found in '%s'!", key.c_str(), (nh.getNamespace() + "/" + key).c_str());
       return;
     }
 
@@ -113,7 +113,7 @@ void ParameterSet::setParam(const std::string& key, const ros::NodeHandle& nh)
   }
   catch(std::exception& e)
   {
-    ROS_ERROR("[setParam] Catched exception while retrieving '%s': %s", key.c_str(), e.what());
+    ROS_ERROR("[ParameterSet] setParam: Catched exception while retrieving '%s': %s", key.c_str(), e.what());
     return;
   }
 }
@@ -133,7 +133,7 @@ bool ParameterSet::getParam(const std::string& key, XmlRpc::XmlRpcValue& p) cons
   std::map<std::string, XmlRpc::XmlRpcValue>::const_iterator itr = params.find(key);
   if (itr == params.end())
   {
-    ROS_ERROR("[getParam] Couldn't find parameter '%s'!", key.c_str());
+    ROS_ERROR("[ParameterSet] getParam: Couldn't find parameter '%s'!", key.c_str());
     return false;
   }
 
@@ -178,13 +178,13 @@ bool ParameterSet::fromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
 
   if (_val.getType() != XmlRpc::XmlRpcValue::TypeStruct)
   {
-    ROS_ERROR("[fromXmlRpcValue] Invalid format given! Expected TypeStruct.");
+    ROS_ERROR("[ParameterSet] fromXmlRpcValue: Invalid format given! Expected TypeStruct.");
     return false;
   }
 
   if (!_val.hasMember("name") || _val["name"].getType() != XmlRpc::XmlRpcValue::TypeString)
   {
-    ROS_ERROR("[fromXmlRpcValue] Invalid format: Parameter set must contain 'name'!");
+    ROS_ERROR("[ParameterSet] fromXmlRpcValue: Invalid format: Parameter set must contain 'name'!");
     return false;
   }
 
@@ -254,7 +254,7 @@ bool ParameterSet::addXmlRpcValue(const std::string& ns, XmlRpc::XmlRpcValue& va
       return result;
     }
     default:
-      ROS_ERROR("[addXmlRpcValue] Unknown type '%u'!", val.getType());
+      ROS_ERROR("[ParameterSet] addXmlRpcValue: Unknown type '%u'!", val.getType());
       return false;
   }
 }
