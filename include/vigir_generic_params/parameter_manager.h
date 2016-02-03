@@ -92,6 +92,14 @@ protected:
 
   static ParameterManager::Ptr singelton;
 
+  // parameter sets
+  std::map<std::string, ParameterSet> param_sets;
+
+  // current selected parameter set
+  ParameterSet::Ptr active_parameter_set;
+
+  /// ROS API
+
   // subscriber
   void updateParameterSet(const ParameterSetMsgConstPtr& params);
 
@@ -121,12 +129,6 @@ protected:
   boost::shared_ptr<GetParameterSetActionServer> get_parameter_set_as;
   boost::shared_ptr<GetAllParameterSetsActionServer> get_all_parameter_sets_as;
   boost::shared_ptr<GetParameterSetNamesActionServer> get_parameter_set_names_as;
-
-  // parameter sets
-  std::map<std::string, ParameterSet> param_sets;
-
-  // current selected parameter set
-  ParameterSet::Ptr active_parameter_set;
 };
 }
 
