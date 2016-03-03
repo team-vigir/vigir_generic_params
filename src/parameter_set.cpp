@@ -3,7 +3,7 @@
 namespace vigir_generic_params
 {
 ParameterSet::ParameterSet(const std::string& name)
-  : name(name)
+  : name_(name)
 {
 }
 
@@ -23,9 +23,9 @@ ParameterSet::~ParameterSet()
 
 std::ostream& operator<<(std::ostream& os, const ParameterSet& params)
 {
-  os << "Name: " << params.getName() << ", size: " << params.params.size();
+  os << "Name: " << params.getName() << ", size: " << params.params_.size();
 
-  for (std::map<std::string, XmlRpc::XmlRpcValue>::const_iterator itr = params.params.begin(); itr != params.params.end(); itr++)
+  for (std::map<std::string, XmlRpc::XmlRpcValue>::const_iterator itr = params.params_.begin(); itr != params.params_.end(); itr++)
     os << "\n" << itr->first << ": " /*<< itr->second*/;
 
   return os;
@@ -33,13 +33,13 @@ std::ostream& operator<<(std::ostream& os, const ParameterSet& params)
 
 void ParameterSet::clear()
 {
-  name = "";
-  params.clear();
+  name_ = "";
+  params_.clear();
 }
 
 unsigned int ParameterSet::size() const
 {
-  return params.size();
+  return params_.size();
 }
 
 void ParameterSet::setName(const std::string& name)
@@ -49,7 +49,7 @@ void ParameterSet::setName(const std::string& name)
 
 const std::string& ParameterSet::getName() const
 {
-  return name;
+  return name_;
 }
 
 template<>
@@ -74,14 +74,14 @@ void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue& p
     {
       if (p.getType() == XmlRpc::XmlRpcValue::TypeString)
       {
-        std::string old_name = name;
-        name = static_cast<std::string>(XmlRpc::XmlRpcValue(p));
+        std::string old_name = name_;
+        name_ = static_cast<std::string>(XmlRpc::XmlRpcValue(p));
 
-        if (old_name == name)
+        if (old_name == name_)
           return;
 
         if (!old_name.empty())
-          ROS_INFO("[ParameterSet] setParam: Renamed parameter set '%s' to '%s'.", old_name.c_str(), name.c_str());
+          ROS_INFO("[ParameterSet] setParam: Renamed parameter set '%s' to '%s'.", old_name.c_str(), name_.c_str());
       }
       else
       {
@@ -90,7 +90,7 @@ void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue& p
       }
     }
 
-    params[_key] = p;
+    params_[_key] = p;
   }
   else
     ROS_ERROR("[ParameterSet] setParam: Type of parameter '%s' not supported!", key.c_str());
@@ -130,8 +130,8 @@ bool ParameterSet::getParam(const std::string& key, XmlRpc::XmlRpcValue& p) cons
 {
   p = XmlRpc::XmlRpcValue();
 
-  std::map<std::string, XmlRpc::XmlRpcValue>::const_iterator itr = params.find(key);
-  if (itr == params.end())
+  std::map<std::string, XmlRpc::XmlRpcValue>::const_iterator itr = params_.find(key);
+  if (itr == params_.end())
   {
     ROS_ERROR("[ParameterSet] getParam: Couldn't find parameter '%s'!", key.c_str());
     return false;
@@ -169,7 +169,7 @@ bool ParameterSet::getParam(const std::string& key, ParameterMsg& p) const
 
 bool ParameterSet::hasParam(const std::string& key) const
 {
-  return params.find(key) != params.end();
+  return params_.find(key) != params_.end();
 }
 
 bool ParameterSet::fromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
@@ -209,9 +209,9 @@ void ParameterSet::toMsg(ParameterSetMsg& param_set) const
 {
   param_set.params.clear();
 
-  param_set.name.data = name;
+  param_set.name.data = name_;
 
-  for (std::map<std::string, XmlRpc::XmlRpcValue>::const_iterator itr = this->params.begin(); itr != this->params.end(); itr++)
+  for (std::map<std::string, XmlRpc::XmlRpcValue>::const_iterator itr = this->params_.begin(); itr != this->params_.end(); itr++)
   {
     ParameterMsg param;
     param.key.data = itr->first;
@@ -224,8 +224,8 @@ std::string ParameterSet::toString() const
 {
   std::ostringstream ss;
 
-  ss << "Set name: " << name;
-  for (std::map<std::string, XmlRpc::XmlRpcValue>::const_iterator itr = this->params.begin(); itr != this->params.end(); itr++)
+  ss << "Set name: " << name_;
+  for (std::map<std::string, XmlRpc::XmlRpcValue>::const_iterator itr = this->params_.begin(); itr != this->params_.end(); itr++)
     ss << "\n" << itr->first << ": " << vigir_generic_params::toString(itr->second);
 
   return ss.str();

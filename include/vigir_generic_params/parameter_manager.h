@@ -43,14 +43,26 @@
 
 namespace vigir_generic_params
 {
-typedef actionlib::SimpleActionServer<SetParameterSetAction>        SetParameterSetActionServer;
-typedef actionlib::SimpleActionServer<GetParameterSetAction>        GetParameterSetActionServer;
-typedef actionlib::SimpleActionServer<GetAllParameterSetsAction>    GetAllParameterSetsActionServer;
-typedef actionlib::SimpleActionServer<GetParameterSetNamesAction>   GetParameterSetNamesActionServer;
-
 class ParameterManager
   : boost::noncopyable
 {
+public:
+  // typedefs
+  typedef boost::shared_ptr<ParameterManager> Ptr;
+  typedef boost::shared_ptr<const ParameterManager> ConstPtr;
+
+protected:
+  typedef actionlib::SimpleActionServer<SetParameterSetAction>        SetParameterSetActionServer;
+  typedef actionlib::SimpleActionServer<GetParameterSetAction>        GetParameterSetActionServer;
+  typedef actionlib::SimpleActionServer<GetAllParameterSetsAction>    GetAllParameterSetsActionServer;
+  typedef actionlib::SimpleActionServer<GetParameterSetNamesAction>   GetParameterSetNamesActionServer;
+
+  static ParameterManager::Ptr singelton_;
+
+  ParameterManager();
+
+  static ParameterManager::Ptr Instance();
+
 public:
   static void initialize(ros::NodeHandle& nh);
 
@@ -63,13 +75,13 @@ public:
   static void loadParameterSets(const std::string& path);
 
   static void updateParameterSet(const ParameterSet& params);
-  static void updateParameterSet(const ParameterSetMsg& param_sets);
+  static void updateParameterSet(const ParameterSetMsg& param_sets_);
 
   static bool getParameterSet(const std::string& name, ParameterSet& params);
-  static bool getParameterSet(const std::string& name, ParameterSetMsg& param_sets);
+  static bool getParameterSet(const std::string& name, ParameterSetMsg& param_sets_);
 
-  static void getAllParameterSets(std::vector<ParameterSet>& param_sets);
-  static void getAllParameterSets(std::vector<ParameterSetMsg>& param_sets);
+  static void getAllParameterSets(std::vector<ParameterSet>& param_sets_);
+  static void getAllParameterSets(std::vector<ParameterSetMsg>& param_sets_);
 
   static void removeParameterSet(const std::string& name);
 
@@ -81,22 +93,13 @@ public:
   static bool setActive(const std::string& name);
   static const ParameterSet& getActive();
 
-  // typedefs
-  typedef boost::shared_ptr<ParameterManager> Ptr;
-  typedef boost::shared_ptr<const ParameterManager> ConstPtr;
-
 protected:
-  ParameterManager();
-
-  static ParameterManager::Ptr& Instance();
-
-  static ParameterManager::Ptr singelton;
 
   // parameter sets
-  std::map<std::string, ParameterSet> param_sets;
+  std::map<std::string, ParameterSet> param_sets_;
 
   // current selected parameter set
-  ParameterSet::Ptr active_parameter_set;
+  ParameterSet::Ptr active_parameter_set_;
 
   /// ROS API
 
@@ -116,19 +119,19 @@ protected:
   void getParameterSetNamesAction(const GetParameterSetNamesGoalConstPtr& goal);
 
   // subscriber
-  ros::Subscriber update_parameter_set_sub;
+  ros::Subscriber update_parameter_set_sub_;
 
   // service servers
-  ros::ServiceServer set_parameter_set_srv;
-  ros::ServiceServer get_parameter_set_srv;
-  ros::ServiceServer get_all_parameter_sets_srv;
-  ros::ServiceServer get_parameter_set_names_srv;
+  ros::ServiceServer set_parameter_set_srv_;
+  ros::ServiceServer get_parameter_set_srv_;
+  ros::ServiceServer get_all_parameter_sets_srv_;
+  ros::ServiceServer get_parameter_set_names_srv_;
 
   // action servers
-  boost::shared_ptr<SetParameterSetActionServer> set_parameter_set_as;
-  boost::shared_ptr<GetParameterSetActionServer> get_parameter_set_as;
-  boost::shared_ptr<GetAllParameterSetsActionServer> get_all_parameter_sets_as;
-  boost::shared_ptr<GetParameterSetNamesActionServer> get_parameter_set_names_as;
+  boost::shared_ptr<SetParameterSetActionServer> set_parameter_set_as_;
+  boost::shared_ptr<GetParameterSetActionServer> get_parameter_set_as_;
+  boost::shared_ptr<GetAllParameterSetsActionServer> get_all_parameter_sets_as_;
+  boost::shared_ptr<GetParameterSetNamesActionServer> get_parameter_set_names_as_;
 };
 }
 

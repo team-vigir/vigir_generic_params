@@ -125,8 +125,8 @@ protected:
    */
   bool addXmlRpcValue(const std::string& ns, XmlRpc::XmlRpcValue& val);
 
-  std::string name;
-  std::map<std::string, XmlRpc::XmlRpcValue> params;
+  std::string name_;
+  std::map<std::string, XmlRpc::XmlRpcValue> params_;
 };
 
 template<> void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue& p);

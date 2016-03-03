@@ -3,96 +3,96 @@
 namespace vigir_generic_params
 {
 ByteStream::ByteStream(unsigned long size)
-  : is_little_endian(IS_LITTLE_ENDIAN)
-  , has_allocated(true)
-  , size(size)
-  , rpos(0)
-  , wpos(0)
+  : is_little_endian_(IS_LITTLE_ENDIAN)
+  , has_allocated_(true)
+  , size_(size)
+  , rpos_(0)
+  , wpos_(0)
 {
-  buffer = (char*)malloc(size * sizeof(char));
+  buffer_ = (char*)malloc(size * sizeof(char));
 }
 
 ByteStream::ByteStream(char* buffer, unsigned long size, bool allocate)
-  : is_little_endian(IS_LITTLE_ENDIAN)
-  , has_allocated(allocate)
-  , size(size)
-  , rpos(0)
-  , wpos(size)
+  : is_little_endian_(IS_LITTLE_ENDIAN)
+  , has_allocated_(allocate)
+  , size_(size)
+  , rpos_(0)
+  , wpos_(size)
 {
   if (allocate)
   {
-    this->buffer = (char*)malloc(size * sizeof(char));
-    memcpy(this->buffer, buffer, size);
+    this->buffer_ = (char*)malloc(size * sizeof(char));
+    memcpy(this->buffer_, buffer, size);
   }
   else
   {
-    this->buffer = buffer;
+    this->buffer_ = buffer;
   }
 }
 
 ByteStream::~ByteStream()
 {
-  if (has_allocated)
-    free(buffer);
+  if (has_allocated_)
+    free(buffer_);
 }
 
 bool ByteStream::write(const void* p, unsigned long size)
 {
-  if (this->size-wpos < size)
+  if (this->size_-wpos_ < size)
   {
-    if (!has_allocated)
+    if (!has_allocated_)
       return false;
 
-    unsigned long old_size = this->size;
+    unsigned long old_size = this->size_;
 
-    while (this->size-wpos < size)
-      this->size*=2;
+    while (this->size_-wpos_ < size)
+      this->size_*=2;
 
-    buffer = (char*)realloc(buffer, this->size);
+    buffer_ = (char*)realloc(buffer_, this->size_);
 
-    ROS_DEBUG("[ByteStream] Increased buffer size from %lu to %lu", old_size, this->size);
+    ROS_DEBUG("[ByteStream] Increased buffer size from %lu to %lu", old_size, this->size_);
   }
 
-  _memcpy(buffer + wpos, p, size);
-  wpos += size;
+  _memcpy(buffer_ + wpos_, p, size);
+  wpos_ += size;
 
   return true;
 }
 
 bool ByteStream::read(void* p, unsigned long size)
 {
-  if (this->size-rpos < size)
+  if (this->size_-rpos_ < size)
     return false;
 
-  _memcpy(p, buffer + rpos, size);
-  rpos += size;
+  _memcpy(p, buffer_ + rpos_, size);
+  rpos_ += size;
 
   return true;
 }
 
 void ByteStream::getData(void* other) const
 {
-  memcpy(other, this->buffer, getDataSize());
+  memcpy(other, this->buffer_, getDataSize());
 }
 
 bool ByteStream::empty() const
 {
-  return wpos == 0;
+  return wpos_ == 0;
 }
 
 unsigned long ByteStream::getBufferSize() const
 {
-  return size;
+  return size_;
 }
 
 unsigned long ByteStream::getDataSize() const
 {
-  return wpos;
+  return wpos_;
 }
 
 void* ByteStream::_memcpy(void* dst, const void* src, size_t len) const
 {
-  if (is_little_endian)
+  if (is_little_endian_)
   {
     return memcpy(dst, src, len);
   }

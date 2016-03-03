@@ -56,13 +56,13 @@ public:
 protected:
   void* _memcpy(void* dst, const void* src, size_t len) const;
 
-  bool is_little_endian;
-  bool has_allocated;
+  bool is_little_endian_;
+  bool has_allocated_;
 
-  char *buffer;
-  unsigned long size; // size of buffer
-  unsigned long rpos; // position in buffer for next read
-  unsigned long wpos; // position in buffer for next write
+  char *buffer_;
+  unsigned long size_; // size of buffer
+  unsigned long rpos_; // position in buffer for next read
+  unsigned long wpos_; // position in buffer for next write
 };
 
 
