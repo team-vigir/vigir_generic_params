@@ -1,5 +1,5 @@
 //=================================================================================================
-// Copyright (c) 2015, Alexander Stumpf, TU Darmstadt
+// Copyright (c) 2016, Alexander Stumpf, TU Darmstadt
 // All rights reserved.
 
 // Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,10 @@ namespace vigir_generic_params
 class ParameterSet
 {
 public:
+  // typedefs
+  typedef boost::shared_ptr<ParameterSet> Ptr;
+  typedef boost::shared_ptr<const ParameterSet> ConstPtr;
+
   ParameterSet(const std::string& name = std::string());
   ParameterSet(const XmlRpc::XmlRpcValue& val);
   ParameterSet(const ParameterSetMsg& params);
@@ -114,10 +118,6 @@ public:
   void toMsg(ParameterSetMsg& param_set) const;
 
   std::string toString() const;
-
-  // typedefs
-  typedef boost::shared_ptr<ParameterSet> Ptr;
-  typedef boost::shared_ptr<const ParameterSet> ConstPtr;
 
 protected:
   /**

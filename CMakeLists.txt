@@ -84,6 +84,7 @@ set(HEADERS
   include/${PROJECT_NAME}/generic_params_msgs.h
   include/${PROJECT_NAME}/parameter_manager.h
   include/${PROJECT_NAME}/parameter_set.h
+  include/${PROJECT_NAME}/rosparam_handler.h
   include/${PROJECT_NAME}/serialization.h
 )
 
@@ -91,6 +92,7 @@ set(SOURCES
   src/generic_params_msgs.cpp
   src/parameter_manager.cpp
   src/parameter_set.cpp
+  src/rosparam_handler.cpp
   src/serialization.cpp
 )
 
