@@ -1,5 +1,7 @@
 #include <vigir_generic_params/parameter_set.h>
 
+
+
 namespace vigir_generic_params
 {
 ParameterSet::ParameterSet(const std::string& name)
@@ -258,4 +260,4 @@ bool ParameterSet::addXmlRpcValue(const std::string& ns, XmlRpc::XmlRpcValue& va
       return false;
   }
 }
-}
+} // namespace

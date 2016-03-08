@@ -1,5 +1,7 @@
 #include <vigir_generic_params/serialization.h>
 
+
+
 namespace vigir_generic_params
 {
 ByteStream::ByteStream(unsigned long size)
@@ -286,4 +288,4 @@ ByteStream& operator>>(ByteStream& data, XmlRpc::XmlRpcValue& out)
 
   return data;
 }
-}
+} // namespace

@@ -1,5 +1,7 @@
 #include <vigir_generic_params/generic_params_msgs.h>
 
+
+
 namespace vigir_generic_params
 {
 std::string toString(const XmlRpc::XmlRpcValue& val)
@@ -40,4 +42,4 @@ std::string strip_const(const std::string& s, const char c)
   std::string _s = s;
   return strip(_s, c);
 }
-}
+} // namespace

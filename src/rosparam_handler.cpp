@@ -1,5 +1,7 @@
 #include <vigir_generic_params/rosparam_handler.h>
 
+
+
 namespace vigir_generic_params
 {
 RosparamHandler::RosparamHandler(const std::string& private_ns, const std::string& public_ns, const ros::NodeHandle& nh)
@@ -8,4 +10,4 @@ RosparamHandler::RosparamHandler(const std::string& private_ns, const std::strin
   , root_nh_(nh)
 {
 }
-}
+} // namespace

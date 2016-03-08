@@ -1,5 +1,7 @@
 #include <vigir_generic_params/parameter_manager.h>
 
+
+
 namespace vigir_generic_params
 {
 ParameterManager::Ptr ParameterManager::singelton_ = ParameterManager::Ptr();
@@ -318,4 +320,4 @@ void ParameterManager::getParameterSetNamesAction(const GetParameterSetNamesGoal
 
   get_parameter_set_names_as_->setSucceeded(result);
 }
-}
+} // namespace
