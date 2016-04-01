@@ -109,6 +109,25 @@ public:
     }
   }
 
+  /**
+   * Retrieves param with given name. If param couldn't be found false will be returned.
+   */
+  template<typename T>
+  T param(const std::string& key, const T& default_val) const
+  {
+    XmlRpc::XmlRpcValue val;
+    if (!getParam(key, val))
+      return default_val;
+
+    if (XmlRpc::XmlRpcValue(T()).getType() != val.getType())
+    {
+      ROS_ERROR("[getParam] Expected XmlRpc type '%s' but got '%s' for parameter '%s'", vigir_generic_params::toString(XmlRpc::XmlRpcValue(T()).getType()).c_str(), vigir_generic_params::toString(val.getType()).c_str(), key.c_str());
+      return default_val;
+    }
+
+    return (T)val;
+  }
+
   bool hasParam(const std::string& key) const;
 
   bool fromXmlRpcValue(const XmlRpc::XmlRpcValue& val);
