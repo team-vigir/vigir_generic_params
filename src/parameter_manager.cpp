@@ -13,6 +13,26 @@ ParameterManager::ParameterManager()
 
 void ParameterManager::initialize(ros::NodeHandle& nh)
 {
+  // load parameter sets if given
+  if (nh.hasParam("params_path"))
+  {
+    std::string path;
+    nh.getParam("params_path", path);
+    vigir_generic_params::ParameterManager::loadParameterSets(path);
+
+    std::vector<std::string> names;
+    vigir_generic_params::ParameterManager::getParameterSetNames(names);
+
+    if (names.empty())
+    {
+      ROS_ERROR("[ParameterManager] Couldn't load any parameter files!");
+      exit(1);
+    }
+
+    if (!nh.hasParam("default_params") || !vigir_generic_params::ParameterManager::setActive(nh.param("default_params", std::string())))
+      vigir_generic_params::ParameterManager::setActive(names.front());
+  }
+
   // subscribe topics
   Instance()->update_parameter_set_sub_ = nh.subscribe("params/update_parameter_set", 1, &ParameterManager::updateParameterSet, Instance().get());
 
