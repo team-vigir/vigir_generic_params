@@ -58,6 +58,8 @@ public:
 
   friend std::ostream& operator<<(std::ostream& os, const ParameterSet& params);
 
+  friend ParameterSet operator+(ParameterSet lhs, const ParameterSet& rhs);
+
   void clear();
 
   unsigned int size() const;
@@ -130,6 +132,15 @@ public:
 
   bool hasParam(const std::string& key) const;
 
+  /**
+   * @brief merge Merges other parameter set into this one
+   * @param other other parameter set
+   */
+  void merge(const ParameterSet& other);
+
+  ParameterSet getSubset(const std::string& key) const;
+
+  bool updateFromXmlRpcValue(const XmlRpc::XmlRpcValue& val);
   bool fromXmlRpcValue(const XmlRpc::XmlRpcValue& val);
 
   void updateFromMsg(const ParameterSetMsg& param_set);
@@ -142,7 +153,7 @@ protected:
   /**
    * Recursively adds parameters from XmlRpc
    */
-  bool addXmlRpcValue(const std::string& ns, XmlRpc::XmlRpcValue& val);
+  bool addXmlRpcValue(const std::string& ns, const XmlRpc::XmlRpcValue& val);
 
   std::string name_;
   std::map<std::string, XmlRpc::XmlRpcValue> params_;
@@ -155,6 +166,12 @@ template<> bool ParameterSet::getParam(const std::string& key, XmlRpc::XmlRpcVal
 template<> bool ParameterSet::getParam(const std::string& key, unsigned int& p) const;
 template<> bool ParameterSet::getParam(const std::string& key, float& p) const;
 template<> bool ParameterSet::getParam(const std::string& key, ParameterMsg& p) const;
+
+template<> bool ParameterSet::getParam(const std::string& key, ParameterSet& p) const; // derives subset from namespace given as key
+
+template<> XmlRpc::XmlRpcValue ParameterSet::param(const std::string& key, const XmlRpc::XmlRpcValue& default_val) const;
+template<> unsigned int ParameterSet::param(const std::string& key, const unsigned int& default_val) const;
+template<> float ParameterSet::param(const std::string& key, const float& default_val) const;
 }
 
 #endif

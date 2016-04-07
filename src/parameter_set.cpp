@@ -33,6 +33,12 @@ std::ostream& operator<<(std::ostream& os, const ParameterSet& params)
   return os;
 }
 
+ParameterSet operator+(ParameterSet lhs, const ParameterSet& rhs)
+{
+  lhs.merge(rhs);
+  return lhs;
+}
+
 void ParameterSet::clear()
 {
   name_ = "";
@@ -169,9 +175,55 @@ bool ParameterSet::getParam(const std::string& key, ParameterMsg& p) const
   return p.data << val;
 }
 
+template<>
+bool ParameterSet::getParam(const std::string& key, ParameterSet& p) const
+{
+  p.clear();
+
+  // strip '/' from key
+  std::string _key = strip_const(key, '/');
+
+  for (auto kv : params_)
+  {
+    if (strncmp(_key.c_str(), kv.first.c_str(), _key.length()) == 0)
+      p.setParam(kv.first.substr(_key.length()), kv.second);
+  }
+
+  return true;
+}
+
+template<>
+XmlRpc::XmlRpcValue ParameterSet::param(const std::string& key, const XmlRpc::XmlRpcValue& default_val) const
+{
+  XmlRpc::XmlRpcValue val;
+  if (!getParam(key, val))
+    return default_val;
+
+  return val;
+}
+
+template<>
+unsigned int ParameterSet::param(const std::string& key, const unsigned int& default_val) const
+{
+  return param(key, (int&)default_val);
+}
+
+template<>
+float ParameterSet::param(const std::string& key, const float& default_val) const
+{
+  double val = default_val;
+  return (float)param(key, val);
+}
+
 bool ParameterSet::hasParam(const std::string& key) const
 {
   return params_.find(key) != params_.end();
+}
+
+bool ParameterSet::updateFromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
+{
+  // start parsing recursively
+  return addXmlRpcValue("", val);
 }
 
 bool ParameterSet::fromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
@@ -191,7 +243,20 @@ bool ParameterSet::fromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
   }
 
   // start parsing recursively
-  return addXmlRpcValue("", _val);
+  return addXmlRpcValue("", val);
+}
+
+void ParameterSet::merge(const ParameterSet& other)
+{
+  for (auto itr : other.params_)
+    setParam(itr.first, itr.second);
+}
+
+ParameterSet ParameterSet::getSubset(const std::string& key) const
+{
+  ParameterSet params;
+  getParam(key, params);
+  return params;
 }
 
 void ParameterSet::updateFromMsg(const ParameterSetMsg& param_Set)
@@ -233,7 +298,7 @@ std::string ParameterSet::toString() const
   return ss.str();
 }
 
-bool ParameterSet::addXmlRpcValue(const std::string& ns, XmlRpc::XmlRpcValue& val)
+bool ParameterSet::addXmlRpcValue(const std::string& ns, const XmlRpc::XmlRpcValue& val)
 {
   switch (val.getType())
   {
@@ -250,8 +315,10 @@ bool ParameterSet::addXmlRpcValue(const std::string& ns, XmlRpc::XmlRpcValue& va
     }
     case XmlRpc::XmlRpcValue::TypeStruct:
     {
+      XmlRpc::XmlRpcValue& _val = const_cast<XmlRpc::XmlRpcValue&>(val); // needed because XmlRpc doesn't implement const getters
+
       bool result  = true;
-      for (XmlRpc::XmlRpcValue::iterator itr = val.begin(); itr != val.end() && result; itr++)
+      for (XmlRpc::XmlRpcValue::iterator itr = _val.begin(); itr != _val.end() && result; itr++)
         result = addXmlRpcValue(ns + (ns.empty() ? itr->first : "/" + itr->first), itr->second);
       return result;
     }
