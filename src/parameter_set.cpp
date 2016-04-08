@@ -287,6 +287,20 @@ void ParameterSet::toMsg(ParameterSetMsg& param_set) const
   }
 }
 
+std::set<std::string> ParameterSet::getNamespaces(unsigned int level, bool include_params) const
+{
+  std::set<std::string> namespaces;
+
+  for (auto param : params_)
+  {
+    std::string ns = extractNamespaceAtLevel(param.first, level, include_params);
+    if (!ns.empty())
+      namespaces.insert(ns);
+  }
+
+  return namespaces;
+}
+
 std::string ParameterSet::toString() const
 {
   std::ostringstream ss;
@@ -326,5 +340,35 @@ bool ParameterSet::addXmlRpcValue(const std::string& ns, const XmlRpc::XmlRpcVal
       ROS_ERROR("[ParameterSet] addXmlRpcValue: Unknown type '%u'!", val.getType());
       return false;
   }
+}
+
+std::string ParameterSet::extractNamespaceAtLevel(const std::string& key, unsigned int level, bool include_params) const
+{
+  std::string result = key;
+
+  // if parameter names should be added, just add '/' to the end to trade them as namespace
+  if (include_params)
+    result.append("/");
+
+  // check first level (a key without '/' can't be a namespace (it's a parameter))
+  size_t pos = result.find("/");
+  if (pos == std::string::npos)
+    return std::string();
+
+  // iterate into deeper levels if needed
+  while (level-- > 0)
+  {
+    result = result.substr(pos+1);
+    pos = result.find("/");
+    if (pos == std::string::npos)
+      return std::string();
+  }
+
+  // remove tail
+  pos = result.find("/");
+  if (pos != std::string::npos)
+    result = result.substr(0, pos);
+
+  return result;
 }
 } // namespace

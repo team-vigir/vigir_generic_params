@@ -147,6 +147,14 @@ public:
   void fromMsg(const ParameterSetMsg& param_set);
   void toMsg(ParameterSetMsg& param_set) const;
 
+  /**
+   * @brief Generates set of all namespaces at given level
+   * @param level level for namespaces to lookup. 0 is the immediate next level.
+   * @param include_params if true, leaf names (parameter names) will be included
+   * @return set of all namespaces at given level
+   */
+  std::set<std::string> getNamespaces(unsigned level = 0, bool include_params = false) const;
+
   std::string toString() const;
 
 protected:
@@ -154,6 +162,15 @@ protected:
    * Recursively adds parameters from XmlRpc
    */
   bool addXmlRpcValue(const std::string& ns, const XmlRpc::XmlRpcValue& val);
+
+  /**
+   * @brief Extract any namespace at specific level from given key
+   * @param key key from where the namespace should be extracted
+   * @param level level of namespace
+   * @param include_params if true, then parameters will be traded as namespace too
+   * @return
+   */
+  std::string extractNamespaceAtLevel(const std::string& key, unsigned int level, bool include_params) const;
 
   std::string name_;
   std::map<std::string, XmlRpc::XmlRpcValue> params_;
