@@ -287,16 +287,19 @@ void ParameterSet::toMsg(ParameterSetMsg& param_set) const
   }
 }
 
-std::set<std::string> ParameterSet::getNamespaces(unsigned int level, bool include_params) const
+std::list<std::string> ParameterSet::getNamespaces(unsigned int level, bool include_params) const
 {
-  std::set<std::string> namespaces;
+  std::list<std::string> namespaces;
 
   for (auto param : params_)
   {
     std::string ns = extractNamespaceAtLevel(param.first, level, include_params);
     if (!ns.empty())
-      namespaces.insert(ns);
+      namespaces.push_back(ns);
   }
+
+  // remove duplicates
+  namespaces.unique();
 
   return namespaces;
 }

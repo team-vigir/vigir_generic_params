@@ -148,12 +148,12 @@ public:
   void toMsg(ParameterSetMsg& param_set) const;
 
   /**
-   * @brief Generates set of all namespaces at given level
+   * @brief Generates list of all namespaces at given level
    * @param level level for namespaces to lookup. 0 is the immediate next level.
    * @param include_params if true, leaf names (parameter names) will be included
-   * @return set of all namespaces at given level
+   * @return list of all namespaces at given level
    */
-  std::set<std::string> getNamespaces(unsigned level = 0, bool include_params = false) const;
+  std::list<std::string> getNamespaces(unsigned level = 0, bool include_params = false) const;
 
   std::string toString() const;
 
