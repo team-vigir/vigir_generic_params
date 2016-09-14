@@ -223,7 +223,7 @@ bool ParameterSet::hasParam(const std::string& key) const
 bool ParameterSet::updateFromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
 {
   // start parsing recursively
-  return addXmlRpcValue("", val);
+  return addFromXmlRpcValue("", val);
 }
 
 bool ParameterSet::fromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
@@ -243,7 +243,7 @@ bool ParameterSet::fromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
   }
 
   // start parsing recursively
-  return addXmlRpcValue("", val);
+  return addFromXmlRpcValue("", val);
 }
 
 void ParameterSet::merge(const ParameterSet& other)
@@ -315,7 +315,7 @@ std::string ParameterSet::toString() const
   return ss.str();
 }
 
-bool ParameterSet::addXmlRpcValue(const std::string& ns, const XmlRpc::XmlRpcValue& val)
+bool ParameterSet::addFromXmlRpcValue(const std::string& ns, const XmlRpc::XmlRpcValue& val)
 {
   switch (val.getType())
   {
@@ -336,7 +336,7 @@ bool ParameterSet::addXmlRpcValue(const std::string& ns, const XmlRpc::XmlRpcVal
 
       bool result  = true;
       for (XmlRpc::XmlRpcValue::iterator itr = _val.begin(); itr != _val.end() && result; itr++)
-        result = addXmlRpcValue(ns + (ns.empty() ? itr->first : "/" + itr->first), itr->second);
+        result = addFromXmlRpcValue(ns + (ns.empty() ? itr->first : "/" + itr->first), itr->second);
       return result;
     }
     default:

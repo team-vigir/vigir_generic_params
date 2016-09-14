@@ -161,7 +161,7 @@ protected:
   /**
    * Recursively adds parameters from XmlRpc
    */
-  bool addXmlRpcValue(const std::string& ns, const XmlRpc::XmlRpcValue& val);
+  bool addFromXmlRpcValue(const std::string& ns, const XmlRpc::XmlRpcValue& val);
 
   /**
    * @brief Extract any namespace at specific level from given key
