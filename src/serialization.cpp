@@ -148,24 +148,24 @@ ByteStream& operator<<(ByteStream& data, const XmlRpc::XmlRpcValue& in)
 //        break;
 //    }
   case XmlRpcValue::TypeArray:
-    {
-      data << (u_int32_t) in.size();
-      for (size_t i = 0; i < in.size(); i++)
-        data << in[i];
-      break;
-    }
-    case XmlRpcValue::TypeStruct:
-    {
-      data << (u_int32_t) in.size();
-      for (XmlRpc::XmlRpcValue::iterator itr = _in.begin(); itr != _in.end(); itr++)
-        data << itr->first << itr->second;
+  {
+    data << (u_int32_t) in.size();
+    for (size_t i = 0; i < in.size(); i++)
+      data << in[i];
+    break;
+  }
+  case XmlRpcValue::TypeStruct:
+  {
+    data << (u_int32_t) in.size();
+    for (XmlRpc::XmlRpcValue::iterator itr = _in.begin(); itr != _in.end(); itr++)
+      data << itr->first << itr->second;
 //      std::string xml = in.toXml();
 //      data << xml;
-      break;
-    }
-    default:
-      ROS_ERROR("operator<<(ByteStream& data, XmlRpcValue& in) not implemented for type '%u'!", in.getType());
-      break;
+    break;
+  }
+  default:
+    ROS_ERROR("operator<<(ByteStream& data, XmlRpcValue& in) not implemented for type '%u'!", in.getType());
+    break;
   }
 
   return data;

@@ -75,6 +75,17 @@ public:
   {
     setParam(key, XmlRpc::XmlRpcValue(p));
   }
+  template<typename T>
+  void setParam(const std::string& key, const std::vector<T>& p)
+  {
+    XmlRpc::XmlRpcValue val;
+    val.setSize(p.size());
+
+    for (size_t i = 0; i < p.size(); i++)
+      val[i] = p[i];
+
+    setParam(key, val);
+  }
 
   void setParam(const ParameterMsg& msg);
 
@@ -100,6 +111,37 @@ public:
     return true;
   }
   template<typename T>
+  bool getParam(const std::string& key, std::vector<T>& p) const
+  {
+    p.clear();
+
+    XmlRpc::XmlRpcValue val;
+    if (!getParam(key, val))
+      return false;
+
+    if (val.getType() != XmlRpc::XmlRpcValue::TypeArray)
+    {
+      ROS_ERROR("[getParam] Expected XmlRpc type 'TypeArray' but got '%s' for parameter '%s'", vigir_generic_params::toString(val.getType()).c_str(), key.c_str());
+      return false;
+    }
+
+    p.resize(val.size());
+
+    XmlRpc::XmlRpcValue::Type type = XmlRpc::XmlRpcValue(T()).getType();
+    for (size_t i = 0; i < val.size(); i++)
+    {
+      if (type != val[i].getType())
+      {
+        ROS_ERROR("[getParam] Expected XmlRpc type '%s' but got '%s' for element of list '%s'", vigir_generic_params::toString(XmlRpc::XmlRpcValue(T()).getType()).c_str(), vigir_generic_params::toString(val.getType()).c_str(), key.c_str());
+        return false;
+      }
+      p[i] = (T)val[i];
+    }
+
+    return true;
+  }
+
+  template<typename T>
   bool getParam(const std::string& key, T& p, const T& default_val) const
   {
     if (getParam<T>(key, p))
@@ -117,17 +159,11 @@ public:
   template<typename T>
   T param(const std::string& key, const T& default_val) const
   {
-    XmlRpc::XmlRpcValue val;
+    T val;
     if (!getParam(key, val))
       return default_val;
-
-    if (XmlRpc::XmlRpcValue(T()).getType() != val.getType())
-    {
-      ROS_ERROR("[getParam] Expected XmlRpc type '%s' but got '%s' for parameter '%s'", vigir_generic_params::toString(XmlRpc::XmlRpcValue(T()).getType()).c_str(), vigir_generic_params::toString(val.getType()).c_str(), key.c_str());
-      return default_val;
-    }
-
-    return (T)val;
+    else
+      return val;
   }
 
   bool hasParam(const std::string& key) const;
