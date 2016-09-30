@@ -139,31 +139,55 @@ public:
     }
 
     return true;
-  }
+  }  
 
+  /**
+   * @brief Retrieves parameter from parameter set
+   * @param key key of parameter
+   * @param p [out] return variable for parameter
+   * @param default_val default value
+   * @param ignore_warnings (default = false) When set to true, no warnings will be printed if param is not available
+   * @return true when parameter was found
+   */
   template<typename T>
-  bool getParam(const std::string& key, T& p, const T& default_val) const
+  bool getParam(const std::string& key, T& p, const T& default_val, bool ignore_warnings = false) const
   {
-    if (getParam<T>(key, p))
-      return true;
-    else
+    if ((ignore_warnings && !hasParam(key)) || !getParam(key, p))
     {
       p = default_val;
       return false;
     }
+    else
+      return true;
   }
 
   /**
-   * Retrieves param with given name. If param couldn't be found false will be returned.
+   * @brief Retrieves parameter from parameter set
+   * @param key key of parameter
+   * @param p [out] return variable for parameter
+   * @param default_val default value
+   * @param ignore_warnings (default = false) When set to true, no warnings will be printed if param is not available
+   * @return true when parameter was found
    */
   template<typename T>
-  T param(const std::string& key, const T& default_val) const
+  bool param(const std::string& key, T& p, const T& default_val, bool ignore_warnings = false) const
+  {
+    return getParam(key, p, default_val);
+  }
+
+  /**
+   * @brief Retrieves parameter from parameter set
+   * @param key key of parameter
+   * @param default_val default value
+   * @param ignore_warnings (default = false) When set to true, no warnings will be printed if param is not available
+   * @return retrieved parameter if available, otherwise given default value
+   */
+  template<typename T>
+  T param(const std::string& key, const T& default_val, bool ignore_warnings = false) const
   {
     T val;
-    if (!getParam(key, val))
-      return default_val;
-    else
-      return val;
+    getParam(key, val, default_val, ignore_warnings);
+    return val;
   }
 
   bool hasParam(const std::string& key) const;
@@ -221,10 +245,6 @@ template<> bool ParameterSet::getParam(const std::string& key, float& p) const;
 template<> bool ParameterSet::getParam(const std::string& key, ParameterMsg& p) const;
 
 template<> bool ParameterSet::getParam(const std::string& key, ParameterSet& p) const; // derives subset from namespace given as key
-
-template<> XmlRpc::XmlRpcValue ParameterSet::param(const std::string& key, const XmlRpc::XmlRpcValue& default_val) const;
-template<> unsigned int ParameterSet::param(const std::string& key, const unsigned int& default_val) const;
-template<> float ParameterSet::param(const std::string& key, const float& default_val) const;
 }
 
 #endif

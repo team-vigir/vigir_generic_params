@@ -192,29 +192,6 @@ bool ParameterSet::getParam(const std::string& key, ParameterSet& p) const
   return true;
 }
 
-template<>
-XmlRpc::XmlRpcValue ParameterSet::param(const std::string& key, const XmlRpc::XmlRpcValue& default_val) const
-{
-  XmlRpc::XmlRpcValue val;
-  if (!getParam(key, val))
-    return default_val;
-
-  return val;
-}
-
-template<>
-unsigned int ParameterSet::param(const std::string& key, const unsigned int& default_val) const
-{
-  return param(key, (int&)default_val);
-}
-
-template<>
-float ParameterSet::param(const std::string& key, const float& default_val) const
-{
-  double val = default_val;
-  return (float)param(key, val);
-}
-
 bool ParameterSet::hasParam(const std::string& key) const
 {
   return params_.find(key) != params_.end();
