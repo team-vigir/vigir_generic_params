@@ -111,7 +111,7 @@ void ParameterSet::setParam(const std::string& key, const ros::NodeHandle& nh)
   {
     if (!nh.hasParam(key))
     {
-      ROS_WARN("[ParameterSet] setParam: Requested parameter '%s' was not found in '%s'!", key.c_str(), (nh.getNamespace() + "/" + key).c_str());
+      ROS_WARN("[ParameterSet] setParam: Requested parameter '%s' was not found in '%s'!", key.c_str(), ros::names::append(nh.getNamespace(), key).c_str());
       return;
     }
 
