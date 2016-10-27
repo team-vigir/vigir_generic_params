@@ -64,6 +64,8 @@ protected:
   static ParameterManager::Ptr Instance();
 
 public:
+  ~ParameterManager();
+
   static void initialize(ros::NodeHandle& nh);
 
   static void clear();
@@ -94,6 +96,8 @@ public:
   static const ParameterSet& getActive();
 
 protected:
+  // nodehandle (namespace) to be used
+  ros::NodeHandle nh_;
 
   // parameter sets
   std::map<std::string, ParameterSet> param_sets_;

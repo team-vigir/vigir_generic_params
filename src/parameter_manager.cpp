@@ -11,13 +11,20 @@ ParameterManager::ParameterManager()
 {
 }
 
+ParameterManager::~ParameterManager()
+{
+  nh_.shutdown();
+}
+
 void ParameterManager::initialize(ros::NodeHandle& nh)
 {
+  Instance()->nh_ = nh;
+
   // load parameter sets if given
-  if (nh.hasParam("params_path"))
+  if (Instance()->nh_.hasParam("params_path"))
   {
     std::string path;
-    nh.getParam("params_path", path);
+    Instance()->nh_.getParam("params_path", path);
     vigir_generic_params::ParameterManager::loadParameterSets(path);
 
     std::vector<std::string> names;
@@ -29,24 +36,24 @@ void ParameterManager::initialize(ros::NodeHandle& nh)
       exit(1);
     }
 
-    if (!nh.hasParam("default_params") || !vigir_generic_params::ParameterManager::setActive(nh.param("default_params", std::string())))
+    if (!Instance()->nh_.hasParam("default_params") || !vigir_generic_params::ParameterManager::setActive(Instance()->nh_.param("default_params", std::string())))
       vigir_generic_params::ParameterManager::setActive(names.front());
   }
 
   // subscribe topics
-  Instance()->update_parameter_set_sub_ = nh.subscribe("params/update_parameter_set", 1, &ParameterManager::updateParameterSet, Instance().get());
+  Instance()->update_parameter_set_sub_ = Instance()->nh_.subscribe("params/update_parameter_set", 1, &ParameterManager::updateParameterSet, Instance().get());
 
   // start own services
-  Instance()->set_parameter_set_srv_ = nh.advertiseService("params/set_parameter_set", &ParameterManager::setParameterSetService, Instance().get());
-  Instance()->get_parameter_set_srv_ = nh.advertiseService("params/get_parameter_set", &ParameterManager::getParameterSetService, Instance().get());
-  Instance()->get_all_parameter_sets_srv_ = nh.advertiseService("params/get_all_parameter_sets", &ParameterManager::getAllParameterSetsService, Instance().get());
-  Instance()->get_parameter_set_names_srv_ = nh.advertiseService("params/get_parameter_set_names", &ParameterManager::getParameterSetNamesService, Instance().get());
+  Instance()->set_parameter_set_srv_ = Instance()->nh_.advertiseService("params/set_parameter_set", &ParameterManager::setParameterSetService, Instance().get());
+  Instance()->get_parameter_set_srv_ = Instance()->nh_.advertiseService("params/get_parameter_set", &ParameterManager::getParameterSetService, Instance().get());
+  Instance()->get_all_parameter_sets_srv_ = Instance()->nh_.advertiseService("params/get_all_parameter_sets", &ParameterManager::getAllParameterSetsService, Instance().get());
+  Instance()->get_parameter_set_names_srv_ = Instance()->nh_.advertiseService("params/get_parameter_set_names", &ParameterManager::getParameterSetNamesService, Instance().get());
 
   // init action servers
-  Instance()->set_parameter_set_as_.reset(new SetParameterSetActionServer(nh, "params/set_parameter_set", boost::bind(&ParameterManager::setParameterSetAction, Instance().get(), _1), false));
-  Instance()->get_parameter_set_as_.reset(new GetParameterSetActionServer(nh, "params/get_parameter_set", boost::bind(&ParameterManager::getParameterSetAction, Instance().get(), _1), false));
-  Instance()->get_all_parameter_sets_as_.reset(new GetAllParameterSetsActionServer(nh, "params/get_all_parameter_sets", boost::bind(&ParameterManager::getAllParameterSetsAction, Instance().get(), _1), false));
-  Instance()->get_parameter_set_names_as_.reset(new GetParameterSetNamesActionServer(nh, "params/get_parameter_set_names", boost::bind(&ParameterManager::getParameterSetNamesAction, Instance().get(), _1), false));
+  Instance()->set_parameter_set_as_.reset(new SetParameterSetActionServer(Instance()->nh_, "params/set_parameter_set", boost::bind(&ParameterManager::setParameterSetAction, Instance().get(), _1), false));
+  Instance()->get_parameter_set_as_.reset(new GetParameterSetActionServer(Instance()->nh_, "params/get_parameter_set", boost::bind(&ParameterManager::getParameterSetAction, Instance().get(), _1), false));
+  Instance()->get_all_parameter_sets_as_.reset(new GetAllParameterSetsActionServer(Instance()->nh_, "params/get_all_parameter_sets", boost::bind(&ParameterManager::getAllParameterSetsAction, Instance().get(), _1), false));
+  Instance()->get_parameter_set_names_as_.reset(new GetParameterSetNamesActionServer(Instance()->nh_, "params/get_parameter_set_names", boost::bind(&ParameterManager::getParameterSetNamesAction, Instance().get(), _1), false));
 
   // start action servers
   Instance()->set_parameter_set_as_->start();
