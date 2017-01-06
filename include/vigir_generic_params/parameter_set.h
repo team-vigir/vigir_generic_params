@@ -139,7 +139,7 @@ public:
     }
 
     return true;
-  }  
+  }
 
   /**
    * @brief Retrieves parameter from parameter set
@@ -159,20 +159,6 @@ public:
     }
     else
       return true;
-  }
-
-  /**
-   * @brief Retrieves parameter from parameter set
-   * @param key key of parameter
-   * @param p [out] return variable for parameter
-   * @param default_val default value
-   * @param ignore_warnings (default = false) When set to true, no warnings will be printed if param is not available
-   * @return true when parameter was found
-   */
-  template<typename T>
-  bool param(const std::string& key, T& p, const T& default_val, bool ignore_warnings = false) const
-  {
-    return getParam(key, p, default_val);
   }
 
   /**
