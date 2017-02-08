@@ -45,6 +45,11 @@ void ParameterSet::clear()
   params_.clear();
 }
 
+bool ParameterSet::empty() const
+{
+  return params_.size() == 0;
+}
+
 unsigned int ParameterSet::size() const
 {
   return params_.size();

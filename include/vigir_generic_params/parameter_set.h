@@ -62,6 +62,7 @@ public:
 
   void clear();
 
+  bool empty() const;
   unsigned int size() const;
 
   void setName(const std::string& name); // Use it carefully as parameter manager isn't aware of any (internal) renaming!
@@ -176,6 +177,11 @@ public:
     return val;
   }
 
+  /**
+   * @brief Determines if param with given key exists in set.
+   * @param key parameter name
+   * @return true if parameter with given key exists
+   */
   bool hasParam(const std::string& key) const;
 
   /**
