@@ -20,15 +20,21 @@ void ParameterManager::initialize(ros::NodeHandle& nh)
 {
   Instance()->nh_ = nh;
 
+  // clear old services
+  Instance()->set_parameter_set_srv_ = ros::ServiceServer();
+  Instance()->get_parameter_set_srv_ = ros::ServiceServer();
+  Instance()->get_all_parameter_sets_srv_ = ros::ServiceServer();
+  Instance()->get_parameter_set_names_srv_ = ros::ServiceServer();
+
   // load parameter sets if given
   if (Instance()->nh_.hasParam("params_path"))
   {
     std::string path;
     Instance()->nh_.getParam("params_path", path);
-    vigir_generic_params::ParameterManager::loadParameterSets(path);
+    ParameterManager::loadParameterSets(path);
 
     std::vector<std::string> names;
-    vigir_generic_params::ParameterManager::getParameterSetNames(names);
+    ParameterManager::getParameterSetNames(names);
 
     if (names.empty())
     {
@@ -36,8 +42,8 @@ void ParameterManager::initialize(ros::NodeHandle& nh)
       exit(1);
     }
 
-    if (!Instance()->nh_.hasParam("default_params") || !vigir_generic_params::ParameterManager::setActive(Instance()->nh_.param("default_params", std::string())))
-      vigir_generic_params::ParameterManager::setActive(names.front());
+    if (!Instance()->nh_.hasParam("default_params") || !ParameterManager::setActive(Instance()->nh_.param("default_params", std::string())))
+      ParameterManager::setActive(names.front());
   }
 
   // subscribe topics
