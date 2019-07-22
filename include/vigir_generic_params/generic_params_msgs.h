@@ -49,8 +49,6 @@
 #include <vigir_generic_params/GetParameterSetNamesAction.h>
 #include <vigir_generic_params/SetParameterSetAction.h>
 
-
-
 namespace vigir_generic_params
 {
 // some helper
@@ -59,6 +57,6 @@ std::string toString(const XmlRpc::XmlRpcValue::Type& type);
 
 std::string& strip(std::string& s, const char c);
 std::string strip_const(const std::string& s, const char c);
-}
+}  // namespace vigir_generic_params
 
 #endif
