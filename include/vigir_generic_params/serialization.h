@@ -31,10 +31,8 @@
 
 #include <ros/ros.h>
 
-#define IS_LITTLE_ENDIAN (*(uint16_t*)"\0\1">>8 != 0)
-#define IS_BIG_ENDIAN (*(uint16_t*)"\1\0">>8 != 0)
-
-
+#define IS_LITTLE_ENDIAN (*(uint16_t*)"\0\1" >> 8 != 0)
+#define IS_BIG_ENDIAN (*(uint16_t*)"\1\0" >> 8 != 0)
 
 namespace vigir_generic_params
 {
@@ -48,7 +46,7 @@ public:
   bool write(const void* p, unsigned long size);
   bool read(void* p, unsigned long size);
 
-  void getData(void *other) const;
+  void getData(void* other) const;
   bool empty() const;
   unsigned long getBufferSize() const;
   unsigned long getDataSize() const;
@@ -59,91 +57,127 @@ protected:
   bool is_little_endian_;
   bool has_allocated_;
 
-  char *buffer_;
-  unsigned long size_; // size of buffer
-  unsigned long rpos_; // position in buffer for next read
-  unsigned long wpos_; // position in buffer for next write
+  char* buffer_;
+  unsigned long size_;  // size of buffer
+  unsigned long rpos_;  // position in buffer for next read
+  unsigned long wpos_;  // position in buffer for next write
 };
 
-
-
-template<typename T>
-ByteStream& operator<<(ByteStream& data, const T& in)
+template <typename T>
+ByteStream& operator<<(ByteStream& stream, const T& in)
 {
-  data.write(&in, sizeof(in));
-  return data;
+  stream.write(&in, sizeof(in));
+  return stream;
 }
 
-template<typename T>
-ByteStream& operator<<(ByteStream& data, const std::vector<T>& in)
+template <template <typename...> class Container, class T>
+ByteStream& operator<<(ByteStream& stream, const Container<T>& in)
 {
-  data << in.size();
-  for (typename std::vector<T>::const_iterator itr = in.begin(); itr != in.end(); itr++)
-    data << *itr;
-  return data;
+  stream << in.size();
+  for (typename Container<T>::const_iterator itr = in.begin(); itr != in.end(); itr++)
+    stream << *itr;
+  return stream;
 }
 
-ByteStream& operator<<(ByteStream& data, const std::string& in);
-ByteStream& operator<<(ByteStream& data, const XmlRpc::XmlRpcValue& in);
-
-template<typename T>
-ByteStream& operator>>(ByteStream& data, T& out)
+template <typename K, typename T>
+ByteStream& operator<<(ByteStream& stream, const std::pair<K, T>& in)
 {
-  data.read(&out, sizeof(out));
-  return data;
+  stream << in.first;
+  stream << in.second;
+  return stream;
 }
 
-template<typename T>
-ByteStream& operator>>(ByteStream& data, std::vector<T>& out)
+template <typename K, typename T>
+ByteStream& operator<<(ByteStream& stream, const std::map<K, T>& in)
+{
+  stream << in.size();
+  for (typename std::map<K, T>::const_iterator itr = in.begin(); itr != in.end(); itr++)
+    stream << *itr;
+  return stream;
+}
+
+ByteStream& operator<<(ByteStream& stream, const std::string& in);
+ByteStream& operator<<(ByteStream& stream, const XmlRpc::XmlRpcValue& in);
+
+template <typename T>
+ByteStream& operator>>(ByteStream& stream, T& out)
+{
+  stream.read(&out, sizeof(out));
+  return stream;
+}
+
+template <template <typename...> class Container, class T>
+ByteStream& operator>>(ByteStream& stream, Container<T>& out)
 {
   size_t size;
-  data >> size;
-  out.resize(size);
+  stream >> size;
+
+  if (std::is_member_function_pointer<decltype(&Container<T>::reserve)>::value)
+    out.reserve(size);
   for (size_t i = 0; i < size; i++)
   {
     T element;
-    data >> element;
-    out[i] = element;
+    stream >> element;
+    out.push_back(std::move(element));
   }
-  return data;
+  return stream;
 }
 
-ByteStream& operator>>(ByteStream& data, std::string& out);
-ByteStream& operator>>(ByteStream& data, XmlRpc::XmlRpcValue& out);
+template <typename K, typename T>
+ByteStream& operator>>(ByteStream& stream, std::pair<K, T>& out)
+{
+  stream >> out.first;
+  stream >> out.second;
+  return stream;
+}
 
+template <typename K, typename T>
+ByteStream& operator>>(ByteStream& stream, std::map<K, T>& out)
+{
+  size_t size;
+  stream >> size;
+  for (size_t i = 0; i < size; i++)
+  {
+    std::pair<K, T> element;
+    stream >> element;
+    out.insert(std::move(element));
+  }
+  return stream;
+}
 
+ByteStream& operator>>(ByteStream& stream, std::string& out);
+ByteStream& operator>>(ByteStream& stream, XmlRpc::XmlRpcValue& out);
 
 // needed for conversion to ros msgs
-template<typename T>
-bool operator<<(std::vector<uint8_t>& data, const T& in)
+template <typename T>
+bool operator<<(std::vector<uint8_t>& stream, const T& in)
 {
   ByteStream data_buf;
   data_buf << in;
-  data.resize(data_buf.getDataSize());
-  data_buf.getData(data.data());
+  stream.resize(data_buf.getDataSize());
+  data_buf.getData(stream.data());
   return true;
 }
 
-template<typename T>
-bool operator>>(const T& in, std::vector<uint8_t>& data)
+template <typename T>
+bool operator>>(const T& in, std::vector<uint8_t>& stream)
 {
-  return operator<<(data, in);
+  return operator<<(stream, in);
 }
 
-template<typename T>
-bool operator<<(T& out, const std::vector<uint8_t>& data)
+template <typename T>
+bool operator<<(T& out, const std::vector<uint8_t>& stream)
 {
-  unsigned int length = sizeof(T);
-  ByteStream data_buf((char*)data.data(), data.size(), false);
+  ByteStream data_buf((char*)stream.data(), stream.size(), false);
   data_buf >> out;
   return true;
 }
 
-template<typename T>
-bool operator>>(const std::vector<uint8_t>& data, T& out)
+template <typename T>
+bool operator>>(const std::vector<uint8_t>& stream, T& out)
 {
-  return operator<<(out, data);
+  return operator<<(out, stream);
 }
-}
+}  // namespace vigir_generic_params
 
 #endif

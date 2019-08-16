@@ -241,11 +241,11 @@ ParameterSet ParameterSet::getSubset(const std::string& key) const
   return params;
 }
 
-void ParameterSet::updateFromMsg(const ParameterSetMsg& param_Set)
+void ParameterSet::updateFromMsg(const ParameterSetMsg& param_set)
 {
-  for (std::vector<ParameterMsg>::const_iterator itr = param_Set.params.begin(); itr != param_Set.params.end(); itr++)
+  for (std::vector<ParameterMsg>::const_iterator itr = param_set.params.begin(); itr != param_set.params.end(); itr++)
     setParam(*itr);
-  setName(param_Set.name.data);
+  setName(param_set.name.data);
 }
 
 void ParameterSet::fromMsg(const ParameterSetMsg& param_set)
