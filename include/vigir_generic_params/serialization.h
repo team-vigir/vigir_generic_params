@@ -36,20 +36,32 @@
 
 namespace vigir_generic_params
 {
+/**
+ * @brief The ByteStream enables to serialize any data type into a stream of bytes. Hereby,
+ * it is endian-safe, thus can be used between different machines for safe data exchange.
+ * However, the ByteStream is designed to reduce the cpu overhead in cost of memory allocation.
+ * ByteStream objects are supposed to have a short-lifespan and should be only used for a single
+ * serialization as otherwise the object will allocate continuously more memory.
+ */
 class ByteStream
 {
 public:
-  ByteStream(unsigned long size = 8);
-  ByteStream(char* buffer, unsigned long size, bool allocate = true);
+  ByteStream(size_t size = 8);
+  ByteStream(char* buffer, size_t size, bool allocate = true);
   virtual ~ByteStream();
 
-  bool write(const void* p, unsigned long size);
-  bool read(void* p, unsigned long size);
+  bool write(const void* p, size_t size);
+  bool read(void* p, size_t size);
 
-  void getData(void* other) const;
-  bool empty() const;
-  unsigned long getBufferSize() const;
-  unsigned long getDataSize() const;
+  inline void getData(void* other) const { memcpy(other, buffer_, getDataSize()); }
+
+  inline bool empty() const { return wpos_ == 0; }
+
+  inline size_t getBufferSize() const { return size_; }
+  inline size_t getDataSize() const { return wpos_; }
+
+  inline size_t remainingUnwrittenBytes() const { return size_ - wpos_; }
+  inline size_t remainingUnreadBytes() const { return wpos_ - rpos_; }
 
 protected:
   void* _memcpy(void* dst, const void* src, size_t len) const;
@@ -58,9 +70,9 @@ protected:
   bool has_allocated_;
 
   char* buffer_;
-  unsigned long size_;  // size of buffer
-  unsigned long rpos_;  // position in buffer for next read
-  unsigned long wpos_;  // position in buffer for next write
+  size_t size_;  // size of buffer
+  size_t rpos_;  // position in buffer for next read
+  size_t wpos_;  // position in buffer for next write
 };
 
 template <typename T>
