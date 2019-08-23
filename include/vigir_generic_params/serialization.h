@@ -82,7 +82,7 @@ ByteStream& operator<<(ByteStream& stream, const T& in)
   return stream;
 }
 
-template <template <typename...> class Container, class T>
+template <template <typename...> class Container, typename T>
 ByteStream& operator<<(ByteStream& stream, const Container<T>& in)
 {
   stream << in.size();
@@ -118,7 +118,7 @@ ByteStream& operator>>(ByteStream& stream, T& out)
   return stream;
 }
 
-template <template <typename...> class Container, class T>
+template <template <typename...> class Container, typename T>
 ByteStream& operator>>(ByteStream& stream, Container<T>& out)
 {
   size_t size;
