@@ -219,10 +219,7 @@ bool ParameterSet::fromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
   }
 
   if (!_val.hasMember("name") || _val["name"].getType() != XmlRpc::XmlRpcValue::TypeString)
-  {
-    ROS_ERROR("[ParameterSet] fromXmlRpcValue: Invalid format: Parameter set must contain 'name'!");
-    return false;
-  }
+    name_ = "NO_NAME_SPECIFIED";
 
   // start parsing recursively
   return addFromXmlRpcValue("", val);
