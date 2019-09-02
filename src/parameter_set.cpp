@@ -1,27 +1,10 @@
 #include <vigir_generic_params/parameter_set.h>
 
-
-
 namespace vigir_generic_params
 {
 ParameterSet::ParameterSet(const std::string& name)
   : name_(name)
-{
-}
-
-ParameterSet::ParameterSet(const XmlRpc::XmlRpcValue& val)
-{
-  fromXmlRpcValue(val);
-}
-
-ParameterSet::ParameterSet(const ParameterSetMsg& params)
-{
-  fromMsg(params);
-}
-
-ParameterSet::~ParameterSet()
-{
-}
+{}
 
 std::ostream& operator<<(std::ostream& os, const ParameterSet& params)
 {
@@ -45,27 +28,7 @@ void ParameterSet::clear()
   params_.clear();
 }
 
-bool ParameterSet::empty() const
-{
-  return params_.size() == 0;
-}
-
-unsigned int ParameterSet::size() const
-{
-  return params_.size();
-}
-
-void ParameterSet::setName(const std::string& name)
-{
-  setParam("name", name);
-}
-
-const std::string& ParameterSet::getName() const
-{
-  return name_;
-}
-
-template<>
+template <>
 void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue& p)
 {
   if (p.valid())
@@ -75,7 +38,7 @@ void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue& p
 
     if (_key.empty())
     {
-      ROS_WARN("[ParameterSet] setParam: Got empty key. Skipping!");
+      ROS_WARN("[ParameterSet] setParam: Got empty key ('%s'). Skipping!", key.c_str());
       return;
     }
 
@@ -83,7 +46,7 @@ void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue& p
     std::transform(_key.begin(), _key.end(), _key.begin(), ::tolower);
 
     // special case for 'name' key
-    if(_key == "name")
+    if (_key == "name")
     {
       if (p.getType() == XmlRpc::XmlRpcValue::TypeString)
       {
@@ -109,7 +72,7 @@ void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue& p
     ROS_ERROR("[ParameterSet] setParam: Type of parameter '%s' not supported!", key.c_str());
 }
 
-template<>
+template <>
 void ParameterSet::setParam(const std::string& key, const ros::NodeHandle& nh)
 {
   try
@@ -124,7 +87,7 @@ void ParameterSet::setParam(const std::string& key, const ros::NodeHandle& nh)
     nh.getParam(key, p);
     setParam(key, p);
   }
-  catch(std::exception& e)
+  catch (std::exception& e)
   {
     ROS_ERROR("[ParameterSet] setParam: Catched exception while retrieving '%s': %s", key.c_str(), e.what());
     return;
@@ -135,10 +98,10 @@ void ParameterSet::setParam(const ParameterMsg& msg)
 {
   XmlRpc::XmlRpcValue val;
   val << msg.data;
-  setParam(msg.key.data, val);
+  addFromXmlRpcValue(msg.key.data, val);
 }
 
-template<>
+template <>
 bool ParameterSet::getParam(const std::string& key, XmlRpc::XmlRpcValue& p) const
 {
   p = XmlRpc::XmlRpcValue();
@@ -154,13 +117,13 @@ bool ParameterSet::getParam(const std::string& key, XmlRpc::XmlRpcValue& p) cons
   return true;
 }
 
-template<>
+template <>
 bool ParameterSet::getParam(const std::string& key, unsigned int& p) const
 {
   return getParam(key, (int&)p);
 }
 
-template<>
+template <>
 bool ParameterSet::getParam(const std::string& key, float& p) const
 {
   double _p;
@@ -169,7 +132,7 @@ bool ParameterSet::getParam(const std::string& key, float& p) const
   return success;
 }
 
-template<>
+template <>
 bool ParameterSet::getParam(const std::string& key, ParameterMsg& p) const
 {
   XmlRpc::XmlRpcValue val;
@@ -180,7 +143,7 @@ bool ParameterSet::getParam(const std::string& key, ParameterMsg& p) const
   return p.data << val;
 }
 
-template<>
+template <>
 bool ParameterSet::getParam(const std::string& key, ParameterSet& p) const
 {
   p.clear();
@@ -190,17 +153,14 @@ bool ParameterSet::getParam(const std::string& key, ParameterSet& p) const
 
   for (auto kv : params_)
   {
-    if (strncmp(_key.c_str(), kv.first.c_str(), _key.length()) == 0)
+    if (strncmp(_key.c_str(), kv.first.c_str(), _key.length()) == 0 && kv.first.length() !=_key.length())
       p.setParam(kv.first.substr(_key.length()), kv.second);
   }
 
   return true;
 }
 
-bool ParameterSet::hasParam(const std::string& key) const
-{
-  return params_.find(key) != params_.end();
-}
+bool ParameterSet::hasParam(const std::string& key) const { return params_.find(key) != params_.end(); }
 
 bool ParameterSet::updateFromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
 {
@@ -210,7 +170,7 @@ bool ParameterSet::updateFromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
 
 bool ParameterSet::fromXmlRpcValue(const XmlRpc::XmlRpcValue& val)
 {
-  XmlRpc::XmlRpcValue& _val = const_cast<XmlRpc::XmlRpcValue&>(val); // needed because XmlRpc doesn't implement const getters
+  XmlRpc::XmlRpcValue& _val = const_cast<XmlRpc::XmlRpcValue&>(val);  // needed because XmlRpc doesn't implement const getters
 
   if (_val.getType() != XmlRpc::XmlRpcValue::TypeStruct)
   {
@@ -257,12 +217,16 @@ void ParameterSet::toMsg(ParameterSetMsg& param_set) const
 
   param_set.name.data = name_;
 
-  for (std::map<std::string, XmlRpc::XmlRpcValue>::const_iterator itr = this->params_.begin(); itr != this->params_.end(); itr++)
+  for (std::map<std::string, XmlRpc::XmlRpcValue>::const_iterator itr = params_.begin(); itr != params_.end(); itr++)
   {
-    ParameterMsg param;
-    param.key.data = itr->first;
-    param.data << itr->second;
-    param_set.params.push_back(param);
+    // we need only to serialize top level elements to prevent redundancies in the msg
+    if (itr->first.find('/') == std::string::npos)
+    {
+      ParameterMsg param;
+      param.key.data = itr->first;
+      param.data << itr->second;
+      param_set.params.push_back(param);
+    }
   }
 }
 
@@ -311,9 +275,14 @@ bool ParameterSet::addFromXmlRpcValue(const std::string& ns, const XmlRpc::XmlRp
     }
     case XmlRpc::XmlRpcValue::TypeStruct:
     {
-      XmlRpc::XmlRpcValue& _val = const_cast<XmlRpc::XmlRpcValue&>(val); // needed because XmlRpc doesn't implement const getters
+      // strip '/' from key
+      std::string key = strip_const(ns, '/');
+      if (!key.empty())  // exclude root element
+        setParam(key, val);
 
-      bool result  = true;
+      XmlRpc::XmlRpcValue& _val = const_cast<XmlRpc::XmlRpcValue&>(val);  // needed because XmlRpc doesn't implement const getters
+
+      bool result = true;
       for (XmlRpc::XmlRpcValue::iterator itr = _val.begin(); itr != _val.end() && result; itr++)
         result = addFromXmlRpcValue(ns + (ns.empty() ? itr->first : "/" + itr->first), itr->second);
       return result;
@@ -340,7 +309,7 @@ std::string ParameterSet::extractNamespaceAtLevel(const std::string& key, unsign
   // iterate into deeper levels if needed
   while (level-- > 0)
   {
-    result = result.substr(pos+1);
+    result = result.substr(pos + 1);
     pos = result.find("/");
     if (pos == std::string::npos)
       return std::string();
@@ -353,4 +322,4 @@ std::string ParameterSet::extractNamespaceAtLevel(const std::string& key, unsign
 
   return result;
 }
-} // namespace
+}  // namespace vigir_generic_params

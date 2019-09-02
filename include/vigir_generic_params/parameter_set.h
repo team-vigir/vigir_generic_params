@@ -52,9 +52,8 @@ public:
   typedef boost::shared_ptr<const ParameterSet> ConstPtr;
 
   ParameterSet(const std::string& name = std::string());
-  ParameterSet(const XmlRpc::XmlRpcValue& val);
-  ParameterSet(const ParameterSetMsg& params);
-  virtual ~ParameterSet();
+  ParameterSet(const XmlRpc::XmlRpcValue& val) { fromXmlRpcValue(val); }
+  ParameterSet(const ParameterSetMsg& params) { fromMsg(params); }
 
   friend std::ostream& operator<<(std::ostream& os, const ParameterSet& params);
 
@@ -62,11 +61,11 @@ public:
 
   void clear();
 
-  bool empty() const;
-  unsigned int size() const;
+  inline bool empty() const { return params_.size() == 0; }
+  inline unsigned int size() const { return params_.size(); }
 
-  void setName(const std::string& name); // Use it carefully as parameter manager isn't aware of any (internal) renaming!
-  const std::string& getName() const;
+  inline void setName(const std::string& name) { setParam("name", name); } // Use it carefully as parameter manager isn't aware of any (internal) renaming!
+  inline const std::string& getName() const { return name_; }
 
   /**
    * Adds or overwrites param with given name.
