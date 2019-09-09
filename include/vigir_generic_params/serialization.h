@@ -75,6 +75,10 @@ protected:
   size_t wpos_;  // position in buffer for next write
 };
 
+/**
+ * In-Stream operators
+ */
+// template for integral types
 template <typename T>
 ByteStream& operator<<(ByteStream& stream, const T& in)
 {
@@ -111,6 +115,10 @@ ByteStream& operator<<(ByteStream& stream, const std::map<K, T>& in)
 ByteStream& operator<<(ByteStream& stream, const std::string& in);
 ByteStream& operator<<(ByteStream& stream, const XmlRpc::XmlRpcValue& in);
 
+/**
+ * Out-Stream operators
+ */
+// template for integral types
 template <typename T>
 ByteStream& operator>>(ByteStream& stream, T& out)
 {
@@ -160,7 +168,9 @@ ByteStream& operator>>(ByteStream& stream, std::map<K, T>& out)
 ByteStream& operator>>(ByteStream& stream, std::string& out);
 ByteStream& operator>>(ByteStream& stream, XmlRpc::XmlRpcValue& out);
 
-// needed for conversion to ros msgs
+/**
+ * Templates required for conversion to ros msgs using std::vector<uint8_t> as member
+ */
 template <typename T>
 bool operator<<(std::vector<uint8_t>& stream, const T& in)
 {
@@ -171,6 +181,7 @@ bool operator<<(std::vector<uint8_t>& stream, const T& in)
   return true;
 }
 
+// variant for swapped argument
 template <typename T>
 bool operator>>(const T& in, std::vector<uint8_t>& stream)
 {
@@ -185,6 +196,7 @@ bool operator<<(T& out, const std::vector<uint8_t>& stream)
   return true;
 }
 
+// variant for swapped argument
 template <typename T>
 bool operator>>(const std::vector<uint8_t>& stream, T& out)
 {
