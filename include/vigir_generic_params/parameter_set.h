@@ -36,8 +36,6 @@
 
 #include <vigir_generic_params/generic_params_msgs.h>
 
-
-
 namespace vigir_generic_params
 {
 /**
@@ -64,18 +62,18 @@ public:
   inline bool empty() const { return params_.size() == 0; }
   inline unsigned int size() const { return params_.size(); }
 
-  inline void setName(const std::string& name) { setParam("name", name); } // Use it carefully as parameter manager isn't aware of any (internal) renaming!
+  inline void setName(const std::string& name) { setParam("name", name); }  // Use it carefully as parameter manager isn't aware of any (internal) renaming!
   inline const std::string& getName() const { return name_; }
 
   /**
    * Adds or overwrites param with given name.
    */
-  template<typename T>
+  template <typename T>
   void setParam(const std::string& key, const T& p)
   {
     setParam(key, XmlRpc::XmlRpcValue(p));
   }
-  template<typename T>
+  template <typename T>
   void setParam(const std::string& key, const std::vector<T>& p)
   {
     XmlRpc::XmlRpcValue val;
@@ -92,7 +90,7 @@ public:
   /**
    * Retrieves param with given name. If param couldn't be found false will be returned.
    */
-  template<typename T>
+  template <typename T>
   bool getParam(const std::string& key, T& p) const
   {
     p = T();
@@ -103,14 +101,15 @@ public:
 
     if (XmlRpc::XmlRpcValue(T()).getType() != val.getType())
     {
-      ROS_ERROR("[getParam] Expected XmlRpc type '%s' but got '%s' for parameter '%s'", vigir_generic_params::toString(XmlRpc::XmlRpcValue(T()).getType()).c_str(), vigir_generic_params::toString(val.getType()).c_str(), key.c_str());
+      ROS_ERROR("[getParam] Expected XmlRpc type '%s' but got '%s' for parameter '%s'", vigir_generic_params::toString(XmlRpc::XmlRpcValue(T()).getType()).c_str(),
+                vigir_generic_params::toString(val.getType()).c_str(), key.c_str());
       return false;
     }
 
     p = (T)val;
     return true;
   }
-  template<typename T>
+  template <typename T>
   bool getParam(const std::string& key, std::vector<T>& p) const
   {
     p.clear();
@@ -132,7 +131,8 @@ public:
     {
       if (type != val[i].getType())
       {
-        ROS_ERROR("[getParam] Expected XmlRpc type '%s' but got '%s' for element of list '%s'", vigir_generic_params::toString(XmlRpc::XmlRpcValue(T()).getType()).c_str(), vigir_generic_params::toString(val.getType()).c_str(), key.c_str());
+        ROS_ERROR("[getParam] Expected XmlRpc type '%s' but got '%s' for element of list '%s'", vigir_generic_params::toString(XmlRpc::XmlRpcValue(T()).getType()).c_str(),
+                  vigir_generic_params::toString(val.getType()).c_str(), key.c_str());
         return false;
       }
       p[i] = (T)val[i];
@@ -149,7 +149,7 @@ public:
    * @param ignore_warnings (default = false) When set to true, no warnings will be printed if param is not available
    * @return true when parameter was found
    */
-  template<typename T>
+  template <typename T>
   bool getParam(const std::string& key, T& p, const T& default_val, bool ignore_warnings = false) const
   {
     if ((ignore_warnings && !hasParam(key)) || !getParam(key, p))
@@ -168,7 +168,7 @@ public:
    * @param ignore_warnings (default = false) When set to true, no warnings will be printed if param is not available
    * @return retrieved parameter if available, otherwise given default value
    */
-  template<typename T>
+  template <typename T>
   T param(const std::string& key, const T& default_val, bool ignore_warnings = false) const
   {
     T val;
@@ -227,15 +227,27 @@ protected:
   std::map<std::string, XmlRpc::XmlRpcValue> params_;
 };
 
-template<> void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue& p);
-template<> void ParameterSet::setParam(const std::string& key, const ros::NodeHandle& nh);
+template <>
+void ParameterSet::setParam(const std::string& key, const XmlRpc::XmlRpcValue& p);
+template <>
+void ParameterSet::setParam(const std::string& key, const ros::NodeHandle& nh);
 
-template<> bool ParameterSet::getParam(const std::string& key, XmlRpc::XmlRpcValue& p) const;
-template<> bool ParameterSet::getParam(const std::string& key, unsigned int& p) const;
-template<> bool ParameterSet::getParam(const std::string& key, float& p) const;
-template<> bool ParameterSet::getParam(const std::string& key, ParameterMsg& p) const;
+template <>
+bool ParameterSet::getParam(const std::string& key, XmlRpc::XmlRpcValue& p) const;
+template <>
+bool ParameterSet::getParam(const std::string& key, unsigned int& p) const;
+template <>
+bool ParameterSet::getParam(const std::string& key, float& p) const;
+template <>
+bool ParameterSet::getParam(const std::string& key, ParameterMsg& p) const;
 
-template<> bool ParameterSet::getParam(const std::string& key, ParameterSet& p) const; // derives subset from namespace given as key
-}
+template <>
+bool ParameterSet::getParam(const std::string& key, ParameterSet& p) const;  // derives subset from namespace given as key
+
+template <>
+bool ParameterSet::getParam(const std::string& key, std::vector<unsigned int>& p) const;
+template <>
+bool ParameterSet::getParam(const std::string& key, std::vector<float>& p) const;
+}  // namespace vigir_generic_params
 
 #endif

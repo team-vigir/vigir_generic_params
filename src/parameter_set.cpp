@@ -153,11 +153,45 @@ bool ParameterSet::getParam(const std::string& key, ParameterSet& p) const
 
   for (auto kv : params_)
   {
-    if (strncmp(_key.c_str(), kv.first.c_str(), _key.length()) == 0 && kv.first.length() !=_key.length())
+    if (strncmp(_key.c_str(), kv.first.c_str(), _key.length()) == 0 && kv.first.length() != _key.length())
       p.setParam(kv.first.substr(_key.length()), kv.second);
   }
 
   return true;
+}
+
+template <>
+bool ParameterSet::getParam(const std::string& key, std::vector<unsigned int>& p) const
+{
+  p.clear();
+
+  std::vector<int> v;
+  if (getParam(key, v, std::vector<int>()))
+  {
+    for (const int& i : v)
+      p.push_back(static_cast<unsigned int>(i));
+
+    return true;
+  }
+
+  return false;
+}
+
+template <>
+bool ParameterSet::getParam(const std::string& key, std::vector<float>& p) const
+{
+  p.clear();
+
+  std::vector<double> v;
+  if (getParam(key, v, std::vector<double>()))
+  {
+    for (const double& d : v)
+      p.push_back(static_cast<float>(d));
+
+    return true;
+  }
+
+  return false;
 }
 
 bool ParameterSet::hasParam(const std::string& key) const { return params_.find(key) != params_.end(); }
