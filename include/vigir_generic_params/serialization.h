@@ -31,6 +31,8 @@
 
 #include <ros/ros.h>
 
+#include <unordered_map>
+
 #define IS_LITTLE_ENDIAN (*(uint16_t*)"\0\1" >> 8 != 0)
 #define IS_BIG_ENDIAN (*(uint16_t*)"\1\0" >> 8 != 0)
 
@@ -112,6 +114,15 @@ ByteStream& operator<<(ByteStream& stream, const std::map<K, T>& in)
   return stream;
 }
 
+template <typename K, typename T>
+ByteStream& operator<<(ByteStream& stream, const std::unordered_map<K, T>& in)
+{
+  stream << in.size();
+  for (typename std::unordered_map<K, T>::const_iterator itr = in.begin(); itr != in.end(); itr++)
+    stream << *itr;
+  return stream;
+}
+
 ByteStream& operator<<(ByteStream& stream, const std::string& in);
 ByteStream& operator<<(ByteStream& stream, const XmlRpc::XmlRpcValue& in);
 
@@ -153,6 +164,20 @@ ByteStream& operator>>(ByteStream& stream, std::pair<K, T>& out)
 
 template <typename K, typename T>
 ByteStream& operator>>(ByteStream& stream, std::map<K, T>& out)
+{
+  size_t size;
+  stream >> size;
+  for (size_t i = 0; i < size; i++)
+  {
+    std::pair<K, T> element;
+    stream >> element;
+    out.insert(std::move(element));
+  }
+  return stream;
+}
+
+template <typename K, typename T>
+ByteStream& operator>>(ByteStream& stream, std::unordered_map<K, T>& out)
 {
   size_t size;
   stream >> size;
