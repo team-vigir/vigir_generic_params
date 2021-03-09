@@ -31,6 +31,9 @@
 
 #include <ros/ros.h>
 
+#include <cstring>
+#include <vector>
+#include <map>
 #include <unordered_map>
 
 #define IS_LITTLE_ENDIAN (*(uint16_t*)"\0\1" >> 8 != 0)

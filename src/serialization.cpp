@@ -50,7 +50,7 @@ bool ByteStream::write(const void* p, size_t size)
 
     buffer_ = (char*)realloc(buffer_, size_);
 
-    ROS_DEBUG("[ByteStream] Increased buffer size from %lu to %lu", old_size, size_);
+    //ROS_DEBUG("[ByteStream] Increased buffer size from %lu to %lu", old_size, size_);
   }
 
   _memcpy(buffer_ + wpos_, p, size);
