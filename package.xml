@@ -46,8 +46,8 @@
 
   <depend>roscpp</depend>
   <depend>rospy</depend>
-  <!--depend>rqt_gui</depend-->
-  <!--depend>rqt_gui_py</depend-->
+  <depend>rqt_gui</depend>
+  <depend>rqt_gui_py</depend>
   <depend>actionlib</depend>
   <depend>actionlib_msgs</depend>
   <depend>std_msgs</depend>
