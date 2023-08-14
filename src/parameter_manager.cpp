@@ -94,21 +94,22 @@ size_t ParameterManager::size()
 bool ParameterManager::loadFromFile(const boost::filesystem::path& path, ParameterSet& params)
 {
   // load yaml file into rosparam server
-  std::string name_space = ros::this_node::getNamespace() + "/" + path.filename().c_str();
-  name_space.resize(name_space.size()-5);
-  std::replace(name_space.begin(), name_space.end(), '.', '_');
+  std::string ns = ros::names::append(ros::this_node::getNamespace(), path.filename().c_str());
+  ns.resize(ns.size()-5);
+  std::replace(ns.begin(), ns.end(), '.', '_');
+  ns += "_" + std::to_string(ros::Time::now().toNSec()); // add timestamp to avoid name collisions
 
-  std::string cmd = "rosparam load " + std::string(path.c_str()) + " " + std::string(name_space.c_str());
+  std::string cmd = "rosparam load " + std::string(path.c_str()) + " " + std::string(ns.c_str());
   if (system(cmd.c_str()))
     return false;
 
   // get parameter as XmlRpcValue
-  ros::NodeHandle nh(name_space);
+  ros::NodeHandle nh(ns);
   XmlRpc::XmlRpcValue val;
   nh.getParam("/", val);
 
   // cleanup
-  cmd = "rosparam delete " + std::string(name_space.c_str());
+  cmd = "rosparam delete " + std::string(ns.c_str());
   if (system(cmd.c_str()))
     return false;
 
