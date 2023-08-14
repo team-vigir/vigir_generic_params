@@ -97,7 +97,7 @@ bool ParameterManager::loadFromFile(const boost::filesystem::path& path, Paramet
   std::string ns = ros::names::append(ros::this_node::getNamespace(), path.filename().c_str());
   ns.resize(ns.size()-5);
   std::replace(ns.begin(), ns.end(), '.', '_');
-  ns += "_" + std::to_string(ros::Time::now().toNSec()); // add timestamp to avoid name collisions
+  ns += "_" + std::to_string(ros::WallTime::now().toNSec()); // add timestamp to avoid name collisions
 
   std::string cmd = "rosparam load " + std::string(path.c_str()) + " " + std::string(ns.c_str());
   if (system(cmd.c_str()))
