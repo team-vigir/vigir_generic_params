@@ -132,7 +132,7 @@ public:
       if (type != val[i].getType())
       {
         ROS_ERROR("[getParam] Expected XmlRpc type '%s' but got '%s' for element of list '%s'", vigir_generic_params::toString(XmlRpc::XmlRpcValue(T()).getType()).c_str(),
-                  vigir_generic_params::toString(val.getType()).c_str(), key.c_str());
+                  vigir_generic_params::toString(val[i].getType()).c_str(), key.c_str());
         return false;
       }
       p[i] = (T)val[i];
