@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>vigir_generic_params</name>
-  <version>0.3.0</version>
+  <version>0.4.0</version>
   <description>The vigir_generic_params package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
@@ -41,13 +41,8 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <buildtool_depend condition="$ROS_PYTHON_VERSION == 2">python-setuptools</buildtool_depend>
-  <buildtool_depend condition="$ROS_PYTHON_VERSION == 3">python3-setuptools</buildtool_depend>
 
   <depend>roscpp</depend>
-  <depend>rospy</depend>
-  <depend>rqt_gui</depend>
-  <depend>rqt_gui_py</depend>
   <depend>actionlib</depend>
   <depend>actionlib_msgs</depend>
   <depend>std_msgs</depend>
